@@ -48,7 +48,7 @@ void objects::grouping(Mat &image, int j) {
                         candidat[e].positiongroup = candidat[j].positiongroup;
                         grouping(image, e);
                     }
-                    line(map2_temp, candidat[j].centre, candidat[e].centre, Scalar(255, 0, 0));
+                 //   line(map2_temp, candidat[j].centre, candidat[e].centre, Scalar(255, 0, 0));
 
                 }
 
@@ -115,8 +115,8 @@ void objects::extractObject(Mat &image, Mat & frame, int i, Mat &map, Mat & map2
                     break;
                 }
 
-                rectangle(map2_temp, Rect(candidat[j].origin, candidat[j].endpoint), Scalar(0, 255, 255), 1);
-                rectangle(threshed, Rect(candidat[j].origin, candidat[j].endpoint), Scalar(0, 255, 255), 1);
+             //  rectangle(map2_temp, Rect(candidat[j].origin, candidat[j].endpoint), Scalar(0, 255, 255), 1);
+             //   rectangle(threshed, Rect(candidat[j].origin, candidat[j].endpoint), Scalar(0, 255, 255), 1);
 
             }
             if (!found) {
@@ -147,7 +147,7 @@ void objects::extractObject(Mat &image, Mat & frame, int i, Mat &map, Mat & map2
             if (candidat[j].lifetime < 150);
 
       
-            rectangle(map2, Rect(candidat[j].origin, candidat[j].endpoint), Scalar(255, 0, 0));
+           // rectangle(map2, Rect(candidat[j].origin, candidat[j].endpoint), Scalar(255, 0, 0));
 
 
         }
@@ -207,8 +207,8 @@ void objects::extractObject(Mat &image, Mat & frame, int i, Mat &map, Mat & map2
 
                 }
 
-            rectangle(frame, obje, Scalar(255, 255, 255));
-            rectangle(map2_temp, obje, Scalar(255, 255, 255));
+          //  rectangle(frame, obje, Scalar(255, 255, 255));
+            //rectangle(map2_temp, obje, Scalar(255, 255, 255));
             Point centre(obje.x + obje.width / 2, obje.y + obje.height / 2);
             //~ circle(map2,  centre, 4, Scalar(255,255,0), 4);
             bool found = false;

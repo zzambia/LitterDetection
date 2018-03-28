@@ -89,9 +89,18 @@ dirsum1.copyTo(D_Sy);
     double alpha_S;
     double alpha_init = 0.01;
     alpha_S = alpha_init;
-        // imshow("gray",image);
+         imshow("gray",image);
 
-     
+      abandoned_map.at<uchar>(abandoned_map.cols,abandoned_map.rows) =255;
+
+  
+       uchar* testptr = abandoned_map.ptr<uchar>(0,image.rows);
+				testptr=testptr+image.cols;
+				cout<<"value derniére "<< (uchar)*testptr <<endl;
+				cout<<"value derniére at "<<  (uchar)abandoned_map.at<uchar>(abandoned_map.cols,abandoned_map.rows) <<endl;
+
+				cv::waitKey(0);
+			      		uint64_t p=0;
     while (1) {
 
         
@@ -151,88 +160,53 @@ dirsum1.copyTo(D_Sy);
             
     
 
-          //  D_Sx = grad_x - B_Sx;
-           //B_Sx = B_Sx + alpha_S*D_Sx;
+            D_Sx = grad_x - B_Sx;
+           B_Sx = B_Sx + alpha_S*D_Sx;
      
          
-             // D_Sy = grad_y - B_Sy;
-           //B_Sy = B_Sy + alpha_S*D_Sy;
+              D_Sy = grad_y - B_Sy;
+           B_Sy = B_Sy + alpha_S*D_Sy;
            
-      // result= result.zeros(image.size(), CV_8UC1);
-    //threshed1   =threshed1.zeros(image.size(), CV_8UC1);
-      //object_map = object_map.zeros(image.size(), CV_8UC1);
+       result= result.zeros(image.size(), CV_8UC1);
+    threshed1   =threshed1.zeros(image.size(), CV_8UC1);
+      object_map = object_map.zeros(image.size(), CV_8UC1);
       
       
     
+	unsigned char *abandoned_map_ptr = (unsigned char*)(abandoned_map.data);
+	unsigned char *result_ptr = (unsigned char*)(result.data);
+	unsigned char *object_map_ptr = (unsigned char*)(object_map.data);
+	
+	unsigned char *F_Sy_ptr = (unsigned char*)(F_Sy.data);
+	unsigned char *F_Sx_ptr = (unsigned char*)(F_Sx.data);
+
+	float  *grad_x_ptr = (float)(grad_x.data);
+	float  *grad_y_ptr = (float)(grad_y.data);
+	float  *D_Sy_ptr = (float)(D_Sy.data);
+	float  *D_Sx_ptr = (float)(D_Sx.data);
+
+
 			for (int j = 1; j < image.rows - 1; j++) {
-
-		    float* B_Sy_ptr = B_Sy.ptr<float>(j)+1;
-		    float* B_Sx_ptr = B_Sx.ptr<float>(j)+1;
-           uchar* threshed1_ptr = threshed1.ptr<uchar>(j)+1;
-
-
-				//pointers declaration
-				//abandoned map
-				//cout<<"row "<<j<<endl;
-                uchar* abandoned_map_ptr = abandoned_map.ptr<uchar>(j)+1;
-                 uchar* abandoned_map_ptr_forward = abandoned_map.ptr<uchar>(j+1)+1;
-                uchar* abandoned_map_ptr_back = abandoned_map.ptr<uchar>(j-1)+1;
-      
-
-                const uchar* abandoned_map_endPixel = abandoned_map_ptr + abandoned_map.cols -1;
-                
-                //results
-                uchar* result_ptr = result.ptr<uchar>(j)+1;
-
-               // const uchar* result_endPixel = result_ptr + abandoned_map.cols -1;
-                
-                        //object_map
-                uchar* object_map_ptr = object_map.ptr<uchar>(j)+1;
-                //const uchar* object_map_endPixel = object_map_ptr + abandoned_map.cols-1;
-                
-                	//F_Sx
-                uchar* F_Sx_ptr = F_Sx.ptr<uchar>(j)+1;
-                //const uchar* F_Sx_endPixel = F_Sx_ptr + abandoned_map.cols-1;
-                
-                	//F_Sy
-              uchar* F_Sy_ptr = F_Sy.ptr<uchar>(j)+1;
-               // const uchar* F_Sy_endPixel = F_Sy_ptr + abandoned_map.cols -1;
-                
-                	//grad_x
-                float* grad_x_ptr = grad_x.ptr<float>(j)+1;
-                //const float* grad_x_endPixel = grad_x_ptr + abandoned_map.cols-1;
-                
-                	//grad_y
-              float* grad_y_ptr = grad_y.ptr<float>(j)+1;
-               // const float* grad_y_endPixel = grad_y_ptr + abandoned_map.cols-1;
-
-				
-				
-					//D_Sx
-                float* D_Sx_ptr = D_Sx.ptr<float>(j)+1;
-                //const float* D_Sx_endPixel = D_Sx_ptr + abandoned_map.cols-1;
-                
-                	//D_Sy
-              float* D_Sy_ptr = D_Sy.ptr<float>(j)+1;
-                //const float* D_Sy_endPixel = D_Sy_ptr + abandoned_map.cols-1;
-
                
             	//for (int k = 1; k < image.cols - 1; k++) {
-            	
-          while(abandoned_map_ptr != abandoned_map_endPixel) {
-					 
-           
-           *D_Sx_ptr=*grad_x_ptr- *B_Sx_ptr;
-           *B_Sx_ptr=*B_Sx_ptr+alpha_S**D_Sx_ptr;
-           
-             *D_Sy_ptr=*grad_y_ptr- *B_Sy_ptr;
-           *B_Sy_ptr=*B_Sy_ptr+alpha_S**D_Sy_ptr;
+        			for (int i = 1; i < image.cols - 1; i++) {
+
+					
 					//cout<<"pixel value"<<(uint)*abandoned_map_ptr<<endl;
                     if (i % framemod2 == 0)
-                        if (*abandoned_map_ptr>= 1)//&& stat.at<uchar>(j,k)==0)
+                        if (*abandoned_map_ptr== 1)//&& stat.at<uchar>(j,k)==0)
                             *abandoned_map_ptr -= 1;
 
-                    if (abs(*D_Sx_ptr) > fore_th && abs(*grad_x_ptr) >= 20) *F_Sx_ptr= 255;
+                    if (abs(*D_Sx_ptr) > fore_th && abs(*grad_x_ptr) >= 20) 
+                    {
+						*F_Sx_ptr= 255;
+						if(p>100000)
+						{
+			cout<<"pixel value"<<*D_Sx_ptr<<endl;
+	
+						cout <<"gggggggggggg"<<endl;
+					}
+						}
 					if (abs(*D_Sy_ptr) > fore_th && abs(*grad_y_ptr) >= 20) *F_Sy_ptr= 255;
 					
 								// cout<<"Fx value"<<(float)abs(*grad_y_ptr)<<endl;
@@ -248,6 +222,7 @@ dirsum1.copyTo(D_Sy);
                             for (int c0 = -1; c0 <= 1; c0++) {
                                // int j1 = j + r0;
                                 //int k1 = k + c0;
+                                // 60-30 PETS 120-80 AVSS
                                 
           if ((*abandoned_map_ptr+c0) > aotime && *abandoned_map_ptr > aotime2 && *abandoned_map_ptr < aotime)
                                     *abandoned_map_ptr = aotime;
@@ -259,9 +234,7 @@ dirsum1.copyTo(D_Sy);
                                     *abandoned_map_ptr = aotime;							
 							}
                           //  }
-                          *result_ptr=0;
-                              *object_map_ptr=0;
-                       *threshed1_ptr = 0;
+                       //threshed1.at<uchar>(j, k) = 0;
                        //result.at<uchar>(j, k) = 0;
                      //object_map.at<uchar>(j, k) = 0;
                         if (*abandoned_map_ptr > aotime) {
@@ -286,8 +259,6 @@ dirsum1.copyTo(D_Sy);
 				result_ptr++;
 				D_Sx_ptr++;
 				D_Sy_ptr++;
-				B_Sx_ptr++;
-				B_Sy_ptr++;
 				abandoned_map_ptr_forward++;
 				abandoned_map_ptr_back++;
                 }
@@ -295,17 +266,18 @@ dirsum1.copyTo(D_Sy);
 
 
             }
+                            				cout<<"running   "<<p<<endl;
 
         double t2 = ((double) getTickCount() - t) / getTickFrequency();
         cout << " static region FPS  " << 1 / t2 << endl;
-                meanfps_static = meanfps_static + (1 / t2) ;
+                meanfps_static = (meanfps_static + (1 / t2)) / 2;
 
+        cout << "mean FPS region  " << meanfps_static << endl;
 
             F = F_Sx + F_Sy;
             Mat  map2;
 
-         //  bitwise_not(abandoned_map, accumulation);
-         //  imshow("accumulation",accumulation);
+          //  bitwise_not(abandoned_map, accumulation);
             abandoned_map.copyTo(map2);
             abandoned_objects.extractObject(result, image, i, abandoned_map, map2);
             cv::Canny(gray, bw, 30, 30 * 3, 3);
@@ -345,7 +317,7 @@ dirsum1.copyTo(D_Sy);
                 if (obj.endpoint.x> int(image.cols - 6)) obj.endpoint.x = image.cols - 6;
 
 
-               rectangle(image, Rect(obj.origin, obj.endpoint), Scalar(255, 255, 255));
+              //  rectangle(image, Rect(obj.origin, obj.endpoint), Scalar(255, 255, 255));
 
 
 
@@ -362,23 +334,23 @@ dirsum1.copyTo(D_Sy);
                         uint h = obj.endpoint.x + c0;
 
 						// FIXME: added missing clamping
-					//	if (w < 0) w = 0; if (w > image.cols) w = image.cols;
-						//if (h < 0) h = 0; if (h > image.rows) h = image.rows;
+						if (w < 0) w = 0; if (w > image.cols) w = image.cols;
+						if (h < 0) h = 0; if (h > image.rows) h = image.rows;
 						
                         segmap1.copyTo(segmap);
                         dirsum1.copyTo(dirsum);
                         Staticness = 0;
                         Objectness = 0;
 
-                        edge_segments(y, x, w, h, Staticness, Objectness);
+                        edge_segments(x, y, w, h, Staticness, Objectness);
 
                         if (Staticness > staticness_th && Objectness > objectness_th && Objectness < 1000000) {
                             enter = true;
                             //results<<" x: "<< x<<" y: "<<y<<" w: "<<w<<" h: "<<h<<endl; 
                             rectangle(image, Rect(obj.origin, obj.endpoint), Scalar(0, 0, 255), 2);
-                            rectangle(threshed1, Rect(obj.origin, obj.endpoint), Scalar(255, 255, 255), 2);
+                            //rectangle(threshed1, Rect(obj.origin, obj.endpoint), Scalar(255, 255, 255), 2);
 
-                            rectangle(map2, Rect(obj.origin, obj.endpoint), Scalar(0, 0, 255), 2);
+                            //rectangle(map2, Rect(obj.origin, obj.endpoint), Scalar(0, 0, 255), 2);
                             putText(image, "Abandoned !", Point(obj.origin.x, obj.origin.y - 10), FONT_HERSHEY_PLAIN, 1, Scalar(0, 0, 255), 2, 8, false);
                             abandoned_objects.abandonnes[u].abandoness++;
 
@@ -410,14 +382,10 @@ dirsum1.copyTo(D_Sy);
         t = ((double) getTickCount() - t) / getTickFrequency();
 
         cout << "FPS  " << 1 / t << endl;
-        meanfps =  (1 / t) +meanfps ;
+        meanfps = (meanfps + (1 / t)) / 2;
+        cout << "mean FPS  " << meanfps << endl;
 
         i++;
     }
-            cout << "mean FPS  " << meanfps/i << endl;
-
-           cout << "mean FPS region  " << meanfps_static/i << endl;
-
-
     return 0;
 }
